@@ -11,11 +11,14 @@
 	<link rel="shortcut icon" type="image/x-icon" href="http://www.pixelatedviews.com/images/favicon.ico" />
 	<link rel="alternate" href="www.pixelatedviews.com" hreflang="en-us" />
 
+	<!-- CSS JS -->
 	<script src="js/css.js" type="text/javascript" charset="utf-8"></script>
-
+	<!-- LESS -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js" type="text/javascript" charset="utf-8"></script>
+	
 	<script src="//code.jquery.com/jquery-latest.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="http://www.pixelatedviews.com/js/jquery.socialcards.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/pixelated.js" type="text/javascript" charset="utf-8"></script>
 
 	<script>
 	
@@ -136,118 +139,199 @@
 </head>
 
 <body>
-	
-	<div id="page-body" class="grid10 push1">
-	
-		<div>
-			<div class="button pull-left"><a href="//www.pixelatedviews.com">Home</a></div>
-			<div class="button push-right"><a href="https://github.com/brianwhaley/socialcards">Download</a></div>
-		</div>
-		
-		
-		<div class="row">	
-			<!-- ===== SOCIAL CARDS ===== -->
-			<div id="socialCards" class="column callout grid12">
-				<div class="callout-header grid12">
-					<h2 class="callout-title">Social Posts</h2>
+
+	<a name="top"></a>
+
+	<div id="panel-menu" class="pad">
+		<!--div>
+			<div class="panel-menu-header grid12">
+				<div class="panel-menu-button push-right">
+					<img src="images/mobile-menu2.png" />
 				</div>
-				<div class="callout-body">
-					<div class="grid12">
-						<div class="masonry" id="social">
-						</div>
+			</div>
+		</div-->
+		<div class="accordion-menu">
+		</div>
+	</div>
+	
+	<!-- PAGE CONTAINER -->
+	<div id="page-container">
+	
+		<!-- / PAGE FIXED HEADER -->
+		<div id="fixed-header" class="grid12">
+	
+			<!-- PAGE HEADER -->
+			<div id="page-header" class="grid12">
+				<div class="content-container">
+					<div class="panel-menu-button pull-left">
+						<img src="images/mobile-menu2.png" />
 					</div>
+					<h1 class="pull-left">Pixelated Views Template</h1>
+					<div class="addthis_sharing_toolbox push-right noMobile"></div>
 				</div>
 			</div>
-			<!-- ===== ===== ===== ===== -->
-		</div>
-
-
-		<div>
-
-			<div class="callout-header grid12">
-				<h2 class="callout-title">Documentation</h2>
+			<!-- / PAGE HEADER -->
+		
+			<!-- PAGE NAV -->
+			<div id="page-nav" class="grid12">
+				<div class="content-container">
+				</div>
 			</div>
-							
-			<h3>Download</h3>
-			<ul>
-			<li><a href="downloads/socialcards-latest.zip">socialcards - latest</a>
-			<li><a href="downloads/socialcards-1.0.zip">socialcards v. 1.0</a>
-			</ul>
-						
-			<h3>Setup</h3>
-			<ul>
-			<li>This javascript plugin requires jQuery, and should be loaded after the initial jQuery library.
-			<li>This design uses a Masonry style, like here - <a href="http://w3bits.com/css-masonry/" target="_blank">http://w3bits.com/css-masonry/</a>.  Examples of the style are available in the source of this demo page.
-			<li>All the images you will need for the card headers are included
-			<li>Add the JavaScript of this page to your site, change all the parameters to fit your needs (see below), and test.
-			</ul>
-						
-			<h3>Blog</h3>
-			<ul>
-			<li>url: This is the URL for the RSS feed
-			<li>This library uses the Google Feed Load API for RSS feeds.
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Etsy</h3>
-			<ul>
-			<li>url: This is the URL for the RSS feed
-			<li>This library uses the Google Feed Load API for RSS feeds.
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Flickr</h3>
-			<ul>
-			<li>userID: An app must be created in Flickr.  This is the userID of the application.
-			<li>apiKey: An app must be created in Flickr.  This is the API key of the application.
-			<li>tags: This is the tags that will be searched
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Foursquare</h3>
-			<ul>
-			<li>url: This is the URL for the RSS feed
-			<li>This library uses the Google Feed Load API for RSS feeds.
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Goodreads</h3>
-			<ul>
-			<li>url: This is the URL for the feed
-			<li>This library uses the Yahoo Query API to gather the Goodreads data.
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Pinterest</h3>
-			<ul>
-			<li>url: This is the URL for the feed of the list you wish to display
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
-		
-			<h3>Tumblr</h3>
-			<ul>
-			<li>url: This is the URL for the RSS feed
-			<li>This library uses the Google Feed Load API for RSS feeds.
-			<li>entryCount: This is a numerical for how many entries to return
-			<li>iconSrc: This is the URL for the header image icon
-			<li>iconSrcAlt: This is the alt text for the header image icon
-			</ul>
+			<!-- / PAGE NAV -->
 			
 		</div>
+		<!-- / PAGE FIXED HEADER -->
+
+		<!-- PAGE FIXED HEADER SPACER -->
+		<div id="fixed-header-spacer" class="grid12">
+		</div>
+		<!-- / PAGE FIXED HEADER SPACER -->
+
+		<!-- PAGE SEARCH -->
+		<div id="page-search" class="grid12 noMobile">
+			<div class="content-container">
+				<gcse:search></gcse:search>
+			</div>
+		</div>
+		<!-- / PAGE SEARCH -->
+		
+		<!-- PAGE BODY -->
+		<div id="page-body" class="grid12">
+			<div class="content-container">
+			
+			
+			
+			
+			
+	
+				<div class="grid10 push1">
+	
+					<div>
+						<div class="button pull-left"><a href="https://github.com/brianwhaley/socialcards">Download</a></div>
+					</div>
+		
+		
+					<div class="row">	
+						<!-- ===== SOCIAL CARDS ===== -->
+						<div id="socialCards" class="column callout grid12">
+							<div class="callout-header grid12">
+								<h2 class="callout-title">Social Posts</h2>
+							</div>
+							<div class="callout-body">
+								<div class="grid12">
+									<div class="masonry" id="social">
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- ===== ===== ===== ===== -->
+					</div>
+
+
+					<div>
+
+						<div class="callout-header grid12">
+							<h2 class="callout-title">Documentation</h2>
+						</div>
+							
+						<h3>Download</h3>
+						<ul>
+						<li><a href="downloads/socialcards-latest.zip">socialcards - latest</a>
+						<li><a href="downloads/socialcards-1.0.zip">socialcards v. 1.0</a>
+						</ul>
+						
+						<h3>Setup</h3>
+						<ul>
+						<li>This javascript plugin requires jQuery, and should be loaded after the initial jQuery library.
+						<li>This design uses a Masonry style, like here - <a href="http://w3bits.com/css-masonry/" target="_blank">http://w3bits.com/css-masonry/</a>.  Examples of the style are available in the source of this demo page.
+						<li>All the images you will need for the card headers are included
+						<li>Add the JavaScript of this page to your site, change all the parameters to fit your needs (see below), and test.
+						</ul>
+						
+						<h3>Blog</h3>
+						<ul>
+						<li>url: This is the URL for the RSS feed
+						<li>This library uses the Google Feed Load API for RSS feeds.
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Etsy</h3>
+						<ul>
+						<li>url: This is the URL for the RSS feed
+						<li>This library uses the Google Feed Load API for RSS feeds.
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Flickr</h3>
+						<ul>
+						<li>userID: An app must be created in Flickr.  This is the userID of the application.
+						<li>apiKey: An app must be created in Flickr.  This is the API key of the application.
+						<li>tags: This is the tags that will be searched
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Foursquare</h3>
+						<ul>
+						<li>url: This is the URL for the RSS feed
+						<li>This library uses the Google Feed Load API for RSS feeds.
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Goodreads</h3>
+						<ul>
+						<li>url: This is the URL for the feed
+						<li>This library uses the Yahoo Query API to gather the Goodreads data.
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Pinterest</h3>
+						<ul>
+						<li>url: This is the URL for the feed of the list you wish to display
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+		
+						<h3>Tumblr</h3>
+						<ul>
+						<li>url: This is the URL for the RSS feed
+						<li>This library uses the Google Feed Load API for RSS feeds.
+						<li>entryCount: This is a numerical for how many entries to return
+						<li>iconSrc: This is the URL for the header image icon
+						<li>iconSrcAlt: This is the alt text for the header image icon
+						</ul>
+			
+					</div>
 					
 
-	</div>
+				</div>
 
+
+
+
+
+
+			</div>
+		</div>
+		<!-- / PAGE BODY -->
+		
+		<!-- PAGE FOOTER -->
+		<div id="page-footer" class="grid12">
+			<div class="content-container">
+			</div>
+		</div>
+		<!-- / PAGE FOOTER -->
+		
+	</div>
+	<!-- / PAGE CONTAINER -->
 </body>
 </html>
