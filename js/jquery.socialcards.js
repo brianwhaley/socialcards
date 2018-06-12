@@ -1,5 +1,5 @@
 /*!
- * SocialCards v. 1.0
+ * SocialCards v. 2.0
  * http://www.pixelatedviews.com/socialcards.html
  *
  * Copyright (c) 2016, Brian Whaley <brian.whaley@gmail.com>
@@ -14,8 +14,6 @@
 /* ========================================
 =====      GLOBAL VARIABLES           =====
 ======================================== */
-var mySocialCards = [];
-mySocialCards.cards = [];
 
 function socialCards() {
     $.socialCards();
@@ -26,7 +24,8 @@ function socialCards() {
 =====      SOCIALCARDS PLUGIN         =====
 ======================================== */
 
-(function( $ ) {
+
+(function($) {
  
     /* $.fn.socialCards = function(options) { */
     $.socialCards = function(options) {
@@ -34,15 +33,21 @@ function socialCards() {
 		/* ========== ========== ========== */
 		var options = $.extend({
 			targetID: "#social", 
+			blank: {
+				url: '',
+				entryCount: 0,
+				iconSrc: '',
+				iconSrcAlt: ''
+			},
 			blog: {
-				url: 'https://blog.pixelatedviews.com/feed/',
-				entryCount: 6,
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/blog-logo.png',
-				iconSrcAlt: 'Pixelated Views Blog Post'
+				iconSrcAlt: 'Blog Post'
 			},
 			etsy: {
-				url: 'https://www.etsy.com/people/bwhaley73/favorites/items.rss',
-				entryCount: 6,
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/etsy-logo.png',
 				iconSrcAlt: 'Etsy Favorite'
 			},
@@ -51,21 +56,22 @@ function socialCards() {
 				iconSrcAlt: 'Facebook Wall Post'
 			}, */
 			flickr: {
-				userID: '15473210@N04',
-				apiKey: '882cab5548d53c9e6b5fb24d59cc321d',
-				tags: 'pixelatedviewsgallery',
-				entryCount: 6,
+				userID: '',
+				apiKey: '',
+				tags: '',
+				entryCount: 0,
 				iconSrc: 'images/flickr-logo.png',
 				iconSrcAlt: 'Flickr Photo'
 			},
 			foursquare: {
-				url: 'https://feeds.foursquare.com/history/LZSXBIJMSBHI5EQXV1GTQOVQW5XRJ0FP.rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/foursquare-logo.png',
 				iconSrcAlt: 'FourSquare Checkin'
 			},
 			goodreads:{
-				url: 'https://www.goodreads.com/review/list?id=49377228&v=2&key=mRDzpwnLeoPPAQf7CAIpPQ&shelf=currently-reading',
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/goodreads-logo.png',
 				iconSrcAlt: 'GoodReads Currently Reading'
 			},
@@ -73,37 +79,42 @@ function socialCards() {
 				iconSrc: 'images/google-plus-logo.png',
 				iconSrcAlt: 'Google Plus Post'
 			}, */
-			/* instagram: {
-				iconSrc: 'images/instagram-logo.png',
+			instagram: {
+				url: '',
+				entryCount: 0,
+				iconSrc: 'images/instagram-logo.jpg',
 				iconSrcAlt: 'Instagram Photo'
-			}, */
+			},
 			pinterest: {
-				url: 'https://www.pinterest.com/brianwhaley/feed.rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/pinterest-logo.png',
 				iconSrcAlt: 'Pinterest Pin'
 			},
 			tumblr: {
-				url: 'http://pixelatedviews.tumblr.com/rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/tumblr-logo.png',
 				iconSrcAlt: 'Tumblr Post'
 			},
 			twitter: {
-				screenName: '@brianwhaley',
-				entryCount: 8,
-				env: 'store://www.pixelatedviews.com/brian-whaley',
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/twitter-logo.png',
 				iconSrcAlt: 'Twitter Tweet'
-			}
-			/* youtube: {
+			},
+			youtube: {
+				url: '',
+				entryCount: 0,
 				iconSrc: 'images/youtube-logo.png',
 				iconSrcAlt: 'Youtube Favorite Video'
-			} */
+			}
 		}, options );
 		
+		var mySocialCards = [];
+		mySocialCards.cards = [];
 		
-		
+		this.myCards = function() { return mySocialCards.cards ; }
 
 		/* ========== ========== ========== */
     	// Private function for debugging.
@@ -114,51 +125,115 @@ function socialCards() {
 		};
 		
 		
-		
-		
+
 		/* ========================================
 		=====        FEEDS API                =====
 		======================================== */
 
-		/* ========== ========== ========== */
-		// function getFeedEntries(myURL, entryCount, callback) {
 		function getFeedEntries(myURL, entryCount) {
-			if (document.location.protocol != "https:") {
-				var myProtocol = "http:";
-			} else {
-				var myProtocol = "https:";
-			}
-			$.ajax({
-				url: myProtocol + '//ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=' + entryCount + '&callback=?&q=' + 
-					encodeURIComponent(myURL),
-				dataType: 'json',
-				success: function(data) {
-					feedToCards(data);
-					/* if (typeof callback == 'function'){
-						callback("#social", mySocialCards);
-					} */
-				},
-				error: function() {
-					console.log("Failed to fetch the feed " + myURL);
+			$.get("https://query.yahooapis.com/v1/public/yql",
+				{
+					q: "select * from xml where url in (\"" + myURL + "\") limit " + entryCount + " offset 0 ",
+					format: "json"
+				},				
+				function(data){
+					/* feedToCards(data); */
+					/* LIMIT DOESNT WORK - LOOP THROUGH RESULTS */
+					for (i = 0; i< entryCount; i++) {
+						if (myURL.indexOf("goodreads") > -1) {
+							goodreadsItemToCard(data.query.results.GoodreadsResponse.reviews.review[i]);
+						} else if (myURL.indexOf("fetchrss") > -1) {
+							fetchRSSItemToCard(data.query.results.rss.channel.item[i]);
+						} else if (myURL.indexOf("youtube") > -1) {
+							youTubeItemToCard(data.query.results.feed.entry[i]);
+						} else {
+							feedItemToCard(data.query.results.rss.channel.item[i]);
+						}
+					}
 				}
-			});
+			);
 		}
 
-
-		/* ========== ========== ========== */
 		function feedToCards(data){
-			$.each(data.responseData.feed.entries, function(entryIndex, entry){
-				var myNewEntry = [];
-				myNewEntry = data.responseData.feed.entries[entryIndex];
-				myNewEntry.source = data.responseData.feed.link;
-				// mySocialCards.cards[Object.size(mySocialCards.cards) + 1] = myNewEntry;
-				mySocialCards.cards.push(myNewEntry);
+			$.each(data.query.results.rss.channel.item, function(itemIndex, thisItem){
+				var myNewCard = [];
+				myNewCard = data.query.results.rss.channel.item[itemIndex];
+				myNewCard.content = thisItem.description;
+				if ( $(thisItem).hasOwnProperty("source") ) {
+				} else {
+					if($.isArray(data.query.results.rss.channel.link)) {
+						if($.isPlainObject(data.query.results.rss.channel.link[0])){
+							myNewCard.source = data.query.results.rss.channel.link[0].href;
+						} else {
+							myNewCard.source = data.query.results.rss.channel.link[0];
+						}
+					} else {
+						myNewCard.source = data.query.results.rss.channel.link;
+					}
+				}
+				mySocialCards.cards.push(myNewCard);
 				mySocialCards.cards.sort(sortCardsByPubDate);
 			});	
 			renderSocialCards(options.targetID, mySocialCards);
 		};
+		
+		function feedItemToCard(thisItem, thisURL){
+			var myNewCard = [];
+			// myNewCard = thisItem;
+			myNewCard.title = thisItem.title;
+			myNewCard.content = thisItem.description;
+			myNewCard.pubDate = thisItem.pubDate;
+			myNewCard.link = thisItem.link;
+			if ( $(thisItem).hasOwnProperty("source") ) {
+			} else {
+				myNewCard.source = myNewCard.link;
+			}
+			mySocialCards.cards.push(myNewCard);
+			mySocialCards.cards.sort(sortCardsByPubDate);
+			renderSocialCards(options.targetID, mySocialCards);
+		};
 
+		function fetchRSSItemToCard(thisItem){
+			var myNewCard = [];
+			// myNewCard = thisItem;
+			myNewCard.content = thisItem.description;
+			myNewCard.pubDate = thisItem.pubDate;
+			myNewCard.link = thisItem.link;
+			myNewCard.source = myNewCard.link;
+			myNewCard.title = thisItem.title;
+			mySocialCards.cards.push(myNewCard);
+			mySocialCards.cards.sort(sortCardsByPubDate);
+			renderSocialCards(options.targetID, mySocialCards);
+		};
 
+		function youTubeItemToCard(thisItem){
+			var myNewCard = [];
+			// myNewCard = thisItem;
+			myNewCard.content = thisItem.link.href + "<br><img src='" + thisItem.group.thumbnail.url + "'>";
+			myNewCard.pubDate = thisItem.published;
+			myNewCard.link = thisItem.link.href;
+			myNewCard.source = myNewCard.link;
+			myNewCard.title = thisItem.title;
+			mySocialCards.cards.push(myNewCard);
+			mySocialCards.cards.sort(sortCardsByPubDate);
+			renderSocialCards(options.targetID, mySocialCards);
+		};
+
+		function goodreadsItemToCard(thisItem){
+			if (thisItem) {
+				var myNewCard = [];
+				myNewCard = {
+					content: '<p><img src="' + thisItem.book.image_url + '" alt="GoodReads Currently Reading" class="textAlignLeft outline" />' + thisItem.book.description + '</p>',
+					link: thisItem.book.link ,
+					pubDate: thisItem.date_added ,
+					source: "www.goodreads.com",
+					title: thisItem.book.title 
+				};
+				mySocialCards.cards.push(myNewCard);
+				mySocialCards.cards.sort(sortCardsByPubDate);
+				renderSocialCards(options.targetID, mySocialCards);
+			}
+		}
 
 
 		/* ========================================
@@ -176,8 +251,6 @@ function socialCards() {
 				page: 1,
 				format: "json",
 				extras: "description, date_upload, date_taken, owner_name, tags"
-				// jsoncallback: "?"
-				// nojsoncallback: "1"
 			})
 			.done(function(data){
 				flickrToCards(data);
@@ -204,7 +277,7 @@ function socialCards() {
 					content: '<p>' + myImgTag + myImg.description._content + '</p>',
 					contentSnippet: "",
 					link: myImgBase ,
-					publishedDate: myImg.datetaken ,
+					pubDate: myImg.datetaken ,
 					source: "www.flickr.com",
 					title: myImg.title
 				};
@@ -213,125 +286,7 @@ function socialCards() {
 			});
 			renderSocialCards(options.targetID, mySocialCards);
 		}
-
-
-
-
-
-		/* ========================================
-		=====        GOODREADS API            =====
-		======================================== */
-
-		/* ========== ========== ========== */
-		function getGoodreadsEntries(myURL){
-			$.get("https://query.yahooapis.com/v1/public/yql",
-				{
-					q: "select * from xml where url=\"" + myURL + "\"",
-					format: "xml"
-				},
-				function(xml){
-					goodreadsToCards(xml);
-				}
-			);
-		};
-
-
-		/* ========== ========== ========== */
-		function goodreadsToCards(xml){
-			$(xml).find('review').each (function() {
-				var myCard = {};
-				myCard = {
-					author: "",
-					categories: [],
-					content: '<p><img src="' + $(this).find('book').find('image_url').first().text() + '" alt="GoodReads Currently Reading" class="textAlignLeft outline" />' + $(this).find('description').text() + '</p>',
-					contentSnippet: "",
-					link: $(this).find('book').find('link').first().text() ,
-					publishedDate: $(this).find('date_added').text() ,
-					source: "www.goodreads.com",
-					title: $(this).find('title').text() 
-				};
-				mySocialCards.cards.push(myCard);
-				mySocialCards.cards.sort(sortCardsByPubDate);
-			});
-			renderSocialCards(options.targetID, mySocialCards);
-		}
-
-
-
-
-		/* ========================================
-		=====        TWITTER API            =====
-		======================================== */
-
-		/* ========== ========== ========== */
-		function getTwitterEntries(screenName, entryCount, env){
-			/* http://stevezeidner.com/twitter-api-v1-1-front-end-access-with-yql/ */
-			// var query = 'select * FROM twitter.user.timeline where screen_name="' + screenName + '" and count="' + entryCount + '" ' ;
-			var query = 'select * FROM twitter.statuses.timeline.user where id="' + screenName + '" and count="' + entryCount + '" ' ;
-			var dataString = {
-				q: query,
-				diagnostics: true,
-				format: 'json',
-				env: env
-			};
-			$.ajax({
-				url: 'https://query.yahooapis.com/v1/public/yql',
-				data: dataString,
-				success: function(data) {
-					console.log("twitter data > ");
-					console.log(data);
-					// $('#returnData').html(JSON.stringify(data, undefined, 2));
-					// twitterToCards(data);
-				}
-			});
-		};
-
-
-		/* ========== ========== ========== */
-		function twitterToCards(data){
-			$(data).find('review').each (function() {
-				var myCard = {};
-				myCard = {
-					author: "",
-					categories: [],
-					content: '<p><img src="' + $(this).find('book').find('image_url').first().text() + '" alt="GoodReads Currently Reading" class="textAlignLeft outline" />' + $(this).find('description').text() + '</p>',
-					contentSnippet: "",
-					link: $(this).find('book').find('link').first().text() ,
-					publishedDate: $(this).find('date_added').text() ,
-					source: "www.goodreads.com",
-					title: $(this).find('title').text() 
-				};
-				socialCards.cards.push(myCard);
-				socialCards.cards.sort(sortCardsByPubDate);
-			});
-			renderSocialCards(options.targetID, mySocialCards);
-		}
-
-		/* ========== ========== ========== */
-		function fetchTweets() {
-			var yql  = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22";
-			var base = "https://twitter.com/i/search/timeline?f=realtime&src=typd&include_entities=0&q=";
-			// Test the URL in YQL console to make sure it works
-			var url  = yql + base + encodeURIComponent('@brianwhaley') + "%22&format=json";
-			// Make synchronous AJAX request to yql
-			console.log(url);
-			var tweets = jQuery.ajax({
-				type: "GET", 
-				url: url, 
-				dataType: 'json', 
-				async: false, 
-				success: function(data) {
-					console.log(data);
-				} 
-			}).responseText;
-			// Parse the JSON response
-			var data = JSON.parse(tweets);
-			// Return the HTML search results
-			// return data.query.results.json.items_html;
-			console.log( data.query.results.json.items_html );
-		}
-
-
+		
 
 		/* ========================================
 		=====        CARD GENERATION          =====
@@ -339,7 +294,7 @@ function socialCards() {
 
 		/* ========== ========== ========== */
 		function sortCardsByPubDate(a, b) {
-			var property = "publishedDate";
+			var property = "pubDate";
 			var dateA = new Date(a[property]);
 			var dateB = new Date(b[property]);
 			if (dateA < dateB) {
@@ -363,10 +318,12 @@ function socialCards() {
 					case (entry.source.indexOf("foursquare.com") > -1): myOptions = options.foursquare; break;
 					case (entry.source.indexOf("flickr.com") > -1): myOptions = options.flickr; break;
 					case (entry.source.indexOf("goodreads.com") > -1): myOptions = options.goodreads; break;
+					case (entry.source.indexOf("instagram") > -1): myOptions = options.instagram; break;
 					case (entry.source.indexOf("pinterest.com") > -1): myOptions = options.pinterest; break;
 					case (entry.source.indexOf("tumblr.com") > -1): myOptions = options.tumblr; break;
-					case (entry.source.indexOf("twitter.com") > -1): myOptions = options.twitter; break;
-					default: break;
+					case (entry.source.indexOf("twitter") > -1): myOptions = options.twitter; break;
+					case (entry.source.indexOf("youtube") > -1): myOptions = options.youtube; break;
+					default: myOptions = options.blank; break;
 				}
 				myFeedIcon = '<img class="cardIcon" src="' + myOptions.iconSrc + '" alt="' + myOptions.iconSrcAlt + '" />';
 				var myHTML = '<div class="masonry-item">';
@@ -379,7 +336,7 @@ function socialCards() {
 				} else {
 					myHTML += '<div class="cardBody">' + entry.content + '</div>'; 
 				}
-				myHTML += '<div class="cardDate">' + entry.publishedDate + '</div>'
+				myHTML += '<div class="cardDate">' + entry.pubDate + '</div>'
 				myHTML += '</div>';
 				myHTML += '</div>';
 				$(myDivId).append(myHTML);
@@ -388,28 +345,28 @@ function socialCards() {
 		
 		
 		/* ========== ========== ========== */
-		this.gatherData = function() {
+		function gatherData() {
 			if(options.blog.url){ getFeedEntries(options.blog.url, options.blog.entryCount); }
 			if(options.etsy.url){ getFeedEntries(options.etsy.url, options.etsy.entryCount); }
 			if(options.flickr.userID){ getFlickrEntries(options.flickr.userID, options.flickr.apiKey, options.flickr.tags, options.flickr.entryCount); }
 			if(options.foursquare.url){ getFeedEntries(options.foursquare.url, options.foursquare.entryCount); }
-			if(options.goodreads.url){ getGoodreadsEntries(options.goodreads.url); }
+			if(options.goodreads.url){ getFeedEntries(options.goodreads.url, options.goodreads.entryCount); }
+			if(options.instagram.url){ getFeedEntries(options.instagram.url, options.instagram.entryCount); };
 			if(options.pinterest.url){ getFeedEntries(options.pinterest.url, options.pinterest.entryCount); }
 			if(options.tumblr.url){ getFeedEntries(options.tumblr.url, options.tumblr.entryCount); }
-			if(options.twitter.screenName){ getTwitterEntries(options.twitter.screenName, options.twitter.entryCount, options.twitter.env); }
-			
-			renderSocialCards(options.targetID, mySocialCards);
-			
-			/*var myTwitterURL = 'https://twitrss.me/twitter_user_to_rss/?user=brianwhaley';
-			var myTwitterId = '#twitter';
-			var myTwitterData = getFeedEntries(myTwitterURL, myTwitterId, 8, renderFeedEntries); */	
-			
-			return this;
+			if(options.twitter.url){ getFeedEntries(options.twitter.url, options.twitter.entryCount); }
+			if(options.youtube.url){ getFeedEntries(options.youtube.url, options.youtube.entryCount); }
 		};
 		
+		
+		/* ========== ========== ========== */
+		this.init = function(){
+			gatherData();
+			renderSocialCards(options.targetID, mySocialCards);
+			return this;
+		}
 
- 
-        return this;
+        return this.init();
  
     };
  
