@@ -1,21 +1,29 @@
 /*!
- * SocialCards v. 1.0
+ * SocialCards v. 3.0
  * http://www.pixelatedviews.com/socialcards.html
  *
  * Copyright (c) 2016, Brian Whaley <brian.whaley@gmail.com>
  * Released under the MIT license
  * https://opensource.org/licenses/mit-license.php
  *
- * Date: 2016-06-08T12:58Z
+ * Date: 2019-12-01T12:58Z
  *
+ * ADDED: Shutterfly
+ * ADDED 500px (NOTE must use 'SOOpx' for properties - numerics not allowed)
+ * FIXED: Instagram feed
+ * FIXED: Remove use of QUERY.YAHOOAPIS.COM YQL
+ * FIXED: YouTube card content
+ * FIXED: Use of entryCount
+ * FIXED: Remove Google Plus
+ * TODO: Goodreads Cards
+ * TODO: Foursquare Feed
+ * 
  */
 
 
 /* ========================================
 =====      GLOBAL VARIABLES           =====
 ======================================== */
-var mySocialCards = [];
-mySocialCards.cards = [];
 
 function socialCards() {
     $.socialCards();
@@ -26,23 +34,35 @@ function socialCards() {
 =====      SOCIALCARDS PLUGIN         =====
 ======================================== */
 
-(function( $ ) {
- 
+
+(function($) {
+
     /* $.fn.socialCards = function(options) { */
     $.socialCards = function(options) {
 
-		/* ========== ========== ========== */
-		var options = $.extend({
-			targetID: "#social", 
+		this.defaults = {
+			targetID: '#social', 
+			blank: {
+				url: '',
+				entryCount: 5,
+				iconSrc: '',
+				iconSrcAlt: ''
+			},
+			SOOpx: {
+				url: '',
+				entryCount: 5,
+				iconSrc: 'images/500px-logo.png',
+				iconSrcAlt: '500px Post'
+			},
 			blog: {
-				url: 'https://blog.pixelatedviews.com/feed/',
-				entryCount: 6,
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/blog-logo.png',
-				iconSrcAlt: 'Pixelated Views Blog Post'
+				iconSrcAlt: 'Blog Post'
 			},
 			etsy: {
-				url: 'https://www.etsy.com/people/bwhaley73/favorites/items.rss',
-				entryCount: 6,
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/etsy-logo.png',
 				iconSrcAlt: 'Etsy Favorite'
 			},
@@ -51,114 +71,129 @@ function socialCards() {
 				iconSrcAlt: 'Facebook Wall Post'
 			}, */
 			flickr: {
-				userID: '15473210@N04',
-				apiKey: '882cab5548d53c9e6b5fb24d59cc321d',
-				tags: 'pixelatedviewsgallery',
-				entryCount: 6,
+				userID: '',
+				apiKey: '',
+				tags: '',
+				entryCount: 5,
 				iconSrc: 'images/flickr-logo.png',
 				iconSrcAlt: 'Flickr Photo'
 			},
 			foursquare: {
-				url: 'https://feeds.foursquare.com/history/LZSXBIJMSBHI5EQXV1GTQOVQW5XRJ0FP.rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/foursquare-logo.png',
 				iconSrcAlt: 'FourSquare Checkin'
 			},
 			goodreads:{
-				url: 'https://www.goodreads.com/review/list?id=49377228&v=2&key=mRDzpwnLeoPPAQf7CAIpPQ&shelf=currently-reading',
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/goodreads-logo.png',
 				iconSrcAlt: 'GoodReads Currently Reading'
 			},
-			/* google: {
-				iconSrc: 'images/google-plus-logo.png',
-				iconSrcAlt: 'Google Plus Post'
-			}, */
-			/* instagram: {
-				iconSrc: 'images/instagram-logo.png',
+			instagram: {
+				userID: '',
+				entryCount: 5,
+				iconSrc: 'images/instagram-logo.jpg',
 				iconSrcAlt: 'Instagram Photo'
-			}, */
+			},
 			pinterest: {
-				url: 'https://www.pinterest.com/brianwhaley/feed.rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/pinterest-logo.png',
 				iconSrcAlt: 'Pinterest Pin'
 			},
+			shutterfly: {
+				url: '',
+				entryCount: 5,
+				iconSrc: 'images/shutterfly-logo.jpg',
+				iconSrcAlt: 'Shutterfly Items'
+			},
 			tumblr: {
-				url: 'http://pixelatedviews.tumblr.com/rss',
-				entryCount: 8,
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/tumblr-logo.png',
 				iconSrcAlt: 'Tumblr Post'
 			},
 			twitter: {
-				screenName: '@brianwhaley',
-				entryCount: 8,
-				env: 'store://www.pixelatedviews.com/brian-whaley',
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/twitter-logo.png',
 				iconSrcAlt: 'Twitter Tweet'
-			}
-			/* youtube: {
+			},
+			youtube: {
+				url: '',
+				entryCount: 5,
 				iconSrc: 'images/youtube-logo.png',
 				iconSrcAlt: 'Youtube Favorite Video'
-			} */
-		}, options );
-		
-		
-		
-
-		/* ========== ========== ========== */
-    	// Private function for debugging.
-		function debug( obj ) {
-			if ( window.console && window.console.log ) {
-				window.console.log( "hilight selection count: " + obj.length );
+			},
+			other: {
+				url: '',
+				entryCount: 5,
+				iconSrc: 'images/blog-logo.png',
+				iconSrcAlt: 'Post'
 			}
 		};
+
+		/* first param true = recursive */
+		var options = $.extend( true, this.defaults, options );
+
+		var mySocialCards = [];
+		mySocialCards.cards = [];
 		
-		
-		
-		
+		this.myCards = function() { return mySocialCards.cards ; }
+
 		/* ========================================
 		=====        FEEDS API                =====
 		======================================== */
 
-		/* ========== ========== ========== */
-		// function getFeedEntries(myURL, entryCount, callback) {
 		function getFeedEntries(myURL, entryCount) {
-			if (document.location.protocol != "https:") {
-				var myProtocol = "http:";
-			} else {
-				var myProtocol = "https:";
-			}
 			$.ajax({
-				url: myProtocol + '//ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=' + entryCount + '&callback=?&q=' + 
-					encodeURIComponent(myURL),
+				url: 'https://api.rss2json.com/v1/api.json',
+				method: 'GET',
 				dataType: 'json',
-				success: function(data) {
-					feedToCards(data);
-					/* if (typeof callback == 'function'){
-						callback("#social", mySocialCards);
-					} */
-				},
-				error: function() {
-					console.log("Failed to fetch the feed " + myURL);
+				data: {
+					rss_url: myURL,
+					api_key: 'c3wsmqh4h1iydxxip3sgkr1jtk3brllbp61jc6yd', 
+					count: entryCount
 				}
-			});
-		}
-
-
-		/* ========== ========== ========== */
-		function feedToCards(data){
-			$.each(data.responseData.feed.entries, function(entryIndex, entry){
-				var myNewEntry = [];
-				myNewEntry = data.responseData.feed.entries[entryIndex];
-				myNewEntry.source = data.responseData.feed.link;
-				// mySocialCards.cards[Object.size(mySocialCards.cards) + 1] = myNewEntry;
-				mySocialCards.cards.push(myNewEntry);
-				mySocialCards.cards.sort(sortCardsByPubDate);
+			}).done( function(data) {
+				$.each(data.items, function(itemIndex, thisItem){
+					var myNewCard = [];
+					myNewCard = data.items[itemIndex];
+					/* ===== FIX FOR DESCRIPTION ===== */
+					myNewCard.content = thisItem.description;
+					if ( thisItem.description ) {
+					} else {
+						var myImgBase = thisItem.thumbnail ;
+						var myImgTag = '<img src="' + myImgBase + '" alt="' + thisItem.title + '" title="' + thisItem.title + '">';
+						myNewCard.content = '<p>' + myImgTag + thisItem.title + '</p>' ;
+						myNewCard.description = myNewCard.content; 
+					}
+ 					/* ===== FIX FOR SOURCE ===== */
+					if ( $(thisItem).hasOwnProperty('source') ) {
+					} else {
+						if($.isArray(thisItem.link)) {
+							if($.isPlainObject(thisItem.link[0])){
+								myNewCard.source = thisItem.link[0].href;
+							} else {
+								myNewCard.source = thisItem.link[0];
+							}
+						} else {
+							myNewCard.source = thisItem.link;
+						}
+					}
+					mySocialCards.cards.push(myNewCard);
+					mySocialCards.cards.sort(sortCardsByPubDate);
+					if (itemIndex >= entryCount) { return false; }
+				});	
+				renderSocialCards(options.targetID, mySocialCards);
+			})
+			.fail(function() {
+				console.log('RSS2JSON API Call failed.');
+			})
+			.always(function() {
 			});	
-			renderSocialCards(options.targetID, mySocialCards);
-		};
-
-
+		}
 
 
 		/* ========================================
@@ -167,170 +202,115 @@ function socialCards() {
 
 		/* ========== ========== ========== */
 		function getFlickrEntries(userID, apiKey, tags, entryCount){
-			$.getJSON( "https://api.flickr.com/services/rest/?jsoncallback=?", {
-				method: "flickr.photos.search",
+			$.getJSON( 'https://api.flickr.com/services/rest/?jsoncallback=?', {
+				method: 'flickr.photos.search',
 				api_key: apiKey,
 				user_id: userID,
 				tags: tags,
 				per_page: entryCount, // 500
 				page: 1,
-				format: "json",
-				extras: "description, date_upload, date_taken, owner_name, tags"
-				// jsoncallback: "?"
-				// nojsoncallback: "1"
+				format: 'json',
+				extras: 'description, date_upload, date_taken, owner_name, tags'
 			})
 			.done(function(data){
-				flickrToCards(data);
+				flickrToCards(data, entryCount);
 			})
 			.fail(function() {
-				console.log("Flickr API Call failed.");
+				console.log('Flickr API Call failed.');
 			})
 			.always(function() {
 			});		
-	
 		};	
 
 
 		/* ========== ========== ========== */
-		function flickrToCards(data){
+		function flickrToCards(data, entryCount){
 			$.each(data.photos.photo, function(index) {
 				var myImg = data.photos.photo[index];
-				var myImgBase = "https://farm" + myImg.farm + ".static.flickr.com/" + myImg.server + "/" + myImg.id + "_" + myImg.secret + ".jpg";
+				var myImgBase = 'https://farm' + myImg.farm + '.static.flickr.com/' + myImg.server + '/' + myImg.id + '_' + myImg.secret + '.jpg';
 				var myImgTag = '<img src="' + myImgBase + '" alt="' + myImg.title + '" title="' + myImg.title + '">';
 				var myCard = {};
 				myCard = {
 					author: myImg.ownername,
 					categories: [],
 					content: '<p>' + myImgTag + myImg.description._content + '</p>',
-					contentSnippet: "",
+					contentSnippet: '',
 					link: myImgBase ,
-					publishedDate: myImg.datetaken ,
-					source: "www.flickr.com",
+					pubDate: myImg.datetaken ,
+					source: 'www.flickr.com',
 					title: myImg.title
 				};
 				mySocialCards.cards.push(myCard);
 				mySocialCards.cards.sort(sortCardsByPubDate);
+				if (index >= entryCount) { return false; }
 			});
 			renderSocialCards(options.targetID, mySocialCards);
 		}
 
 
-
-
-
 		/* ========================================
-		=====        GOODREADS API            =====
+		=====       GOODREADS API             =====
 		======================================== */
 
 		/* ========== ========== ========== */
-		function getGoodreadsEntries(myURL){
-			$.get("https://query.yahooapis.com/v1/public/yql",
-				{
-					q: "select * from xml where url=\"" + myURL + "\"",
-					format: "xml"
-				},
-				function(xml){
-					goodreadsToCards(xml);
-				}
-			);
+		function getGoodreadsEntries(myURL, entryCount){
+			$.get( myURL, {
+			})
+			.done(function(data){
+				console.log(data);
+			})
+			.fail(function() {
+				console.log('Goodreads Call failed.');
+			})
+			.always(function() {
+			});		
+		};
+
+
+		/* ========================================
+		=====       INSTAGRAM API             =====
+		======================================== */
+
+		/* ========== ========== ========== */
+		function getInstagramEntries(userID, entryCount){
+			$.getJSON('https://www.instagram.com/' + userID + '/?__a=1',{
+			})
+			.done(function(data){
+				instagramToCards(data, entryCount);
+			})
+			.fail(function() {
+				console.log('Instagram Call failed.');
+			})
+			.always(function() {
+			});		
 		};
 
 
 		/* ========== ========== ========== */
-		function goodreadsToCards(xml){
-			$(xml).find('review').each (function() {
+		function instagramToCards(data, entryCount){
+			$.each(data.graphql.user.edge_owner_to_timeline_media.edges, function(index) {
+				var myGram = data.graphql.user.edge_owner_to_timeline_media.edges[index].node;
+				var myGramBase = myGram.thumbnail_src;
+				var myGramName = myGram.owner.username;
+				if (myGram.location) { myGramName = myGram.location.name; }
+				var myGramTag = '<img src="' + myGramBase + '" alt="' + myGramName + '" title="' + myGramName + '">';
 				var myCard = {};
 				myCard = {
-					author: "",
+					author: myGram.owner.username,
 					categories: [],
-					content: '<p><img src="' + $(this).find('book').find('image_url').first().text() + '" alt="GoodReads Currently Reading" class="textAlignLeft outline" />' + $(this).find('description').text() + '</p>',
-					contentSnippet: "",
-					link: $(this).find('book').find('link').first().text() ,
-					publishedDate: $(this).find('date_added').text() ,
-					source: "www.goodreads.com",
-					title: $(this).find('title').text() 
+					content: '<p>' + myGramTag + myGramName + '</p>',
+					contentSnippet: '',
+					link: myGramBase ,
+					pubDate: new Date(myGram.taken_at_timestamp * 1000) ,
+					source: 'www.instagram.com',
+					title: myGramName
 				};
 				mySocialCards.cards.push(myCard);
 				mySocialCards.cards.sort(sortCardsByPubDate);
+				if (index >= entryCount) { return false; }
 			});
 			renderSocialCards(options.targetID, mySocialCards);
 		}
-
-
-
-
-		/* ========================================
-		=====        TWITTER API            =====
-		======================================== */
-
-		/* ========== ========== ========== */
-		function getTwitterEntries(screenName, entryCount, env){
-			/* http://stevezeidner.com/twitter-api-v1-1-front-end-access-with-yql/ */
-			// var query = 'select * FROM twitter.user.timeline where screen_name="' + screenName + '" and count="' + entryCount + '" ' ;
-			var query = 'select * FROM twitter.statuses.timeline.user where id="' + screenName + '" and count="' + entryCount + '" ' ;
-			var dataString = {
-				q: query,
-				diagnostics: true,
-				format: 'json',
-				env: env
-			};
-			$.ajax({
-				url: 'https://query.yahooapis.com/v1/public/yql',
-				data: dataString,
-				success: function(data) {
-					console.log("twitter data > ");
-					console.log(data);
-					// $('#returnData').html(JSON.stringify(data, undefined, 2));
-					// twitterToCards(data);
-				}
-			});
-		};
-
-
-		/* ========== ========== ========== */
-		function twitterToCards(data){
-			$(data).find('review').each (function() {
-				var myCard = {};
-				myCard = {
-					author: "",
-					categories: [],
-					content: '<p><img src="' + $(this).find('book').find('image_url').first().text() + '" alt="GoodReads Currently Reading" class="textAlignLeft outline" />' + $(this).find('description').text() + '</p>',
-					contentSnippet: "",
-					link: $(this).find('book').find('link').first().text() ,
-					publishedDate: $(this).find('date_added').text() ,
-					source: "www.goodreads.com",
-					title: $(this).find('title').text() 
-				};
-				socialCards.cards.push(myCard);
-				socialCards.cards.sort(sortCardsByPubDate);
-			});
-			renderSocialCards(options.targetID, mySocialCards);
-		}
-
-		/* ========== ========== ========== */
-		function fetchTweets() {
-			var yql  = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22";
-			var base = "https://twitter.com/i/search/timeline?f=realtime&src=typd&include_entities=0&q=";
-			// Test the URL in YQL console to make sure it works
-			var url  = yql + base + encodeURIComponent('@brianwhaley') + "%22&format=json";
-			// Make synchronous AJAX request to yql
-			console.log(url);
-			var tweets = jQuery.ajax({
-				type: "GET", 
-				url: url, 
-				dataType: 'json', 
-				async: false, 
-				success: function(data) {
-					console.log(data);
-				} 
-			}).responseText;
-			// Parse the JSON response
-			var data = JSON.parse(tweets);
-			// Return the HTML search results
-			// return data.query.results.json.items_html;
-			console.log( data.query.results.json.items_html );
-		}
-
 
 
 		/* ========================================
@@ -339,7 +319,7 @@ function socialCards() {
 
 		/* ========== ========== ========== */
 		function sortCardsByPubDate(a, b) {
-			var property = "publishedDate";
+			var property = 'pubDate';
 			var dateA = new Date(a[property]);
 			var dateB = new Date(b[property]);
 			if (dateA < dateB) {
@@ -356,17 +336,22 @@ function socialCards() {
 		function renderSocialCards(myDivId, data){
 			$(myDivId).empty();
 			$.each(data.cards, function(entryIndex, entry){
-				var myFeedIcon = "";
+				var myFeedIcon = '';
 				switch (true) {
-					case (entry.source.indexOf("blog") > -1): myOptions = options.blog; break;
-					case (entry.source.indexOf("etsy.com") > -1): myOptions = options.etsy; break;
-					case (entry.source.indexOf("foursquare.com") > -1): myOptions = options.foursquare; break;
-					case (entry.source.indexOf("flickr.com") > -1): myOptions = options.flickr; break;
-					case (entry.source.indexOf("goodreads.com") > -1): myOptions = options.goodreads; break;
-					case (entry.source.indexOf("pinterest.com") > -1): myOptions = options.pinterest; break;
-					case (entry.source.indexOf("tumblr.com") > -1): myOptions = options.tumblr; break;
-					case (entry.source.indexOf("twitter.com") > -1): myOptions = options.twitter; break;
-					default: break;
+					case (entry.source.indexOf('500px.com') > -1): myOptions = options.SOOpx; break;
+					case (entry.source.indexOf('blog') > -1): myOptions = options.blog; break;
+					case (entry.source.indexOf('etsy.com') > -1): myOptions = options.etsy; break;
+					case (entry.source.indexOf('foursquare.com') > -1): myOptions = options.foursquare; break;
+					case (entry.source.indexOf('flickr.com') > -1): myOptions = options.flickr; break;
+					case (entry.source.indexOf('goodreads.com') > -1): myOptions = options.goodreads; break;
+					case (entry.source.indexOf('instagram') > -1): myOptions = options.instagram; break;
+					case (entry.source.indexOf('pinterest.com') > -1): myOptions = options.pinterest; break;
+					case (entry.source.indexOf('shutterfly.com') > -1): myOptions = options.shutterfly; break;
+					case (entry.source.indexOf('tumblr.com') > -1): myOptions = options.tumblr; break;
+					case (entry.source.indexOf('twitter') > -1): myOptions = options.twitter; break;
+					case (entry.source.indexOf('youtube') > -1): myOptions = options.youtube; break;
+					case (entry.source.indexOf('other') > -1): myOptions = options.other; break;
+					default: myOptions = options.blank; break;
 				}
 				myFeedIcon = '<img class="cardIcon" src="' + myOptions.iconSrc + '" alt="' + myOptions.iconSrcAlt + '" />';
 				var myHTML = '<div class="masonry-item">';
@@ -379,7 +364,7 @@ function socialCards() {
 				} else {
 					myHTML += '<div class="cardBody">' + entry.content + '</div>'; 
 				}
-				myHTML += '<div class="cardDate">' + entry.publishedDate + '</div>'
+				myHTML += '<div class="cardDate">' + entry.pubDate + '</div>'
 				myHTML += '</div>';
 				myHTML += '</div>';
 				$(myDivId).append(myHTML);
@@ -388,29 +373,31 @@ function socialCards() {
 		
 		
 		/* ========== ========== ========== */
-		this.gatherData = function() {
-			if(options.blog.url){ getFeedEntries(options.blog.url, options.blog.entryCount); }
-			if(options.etsy.url){ getFeedEntries(options.etsy.url, options.etsy.entryCount); }
+		function gatherData() {
+			for(var prop in options) {
+				var option = options[prop] ;
+				if (option.hasOwnProperty('url')) {
+					if (option.url){
+						getFeedEntries(option.url, option.entryCount);
+					}
+				}
+			}
 			if(options.flickr.userID){ getFlickrEntries(options.flickr.userID, options.flickr.apiKey, options.flickr.tags, options.flickr.entryCount); }
-			if(options.foursquare.url){ getFeedEntries(options.foursquare.url, options.foursquare.entryCount); }
-			if(options.goodreads.url){ getGoodreadsEntries(options.goodreads.url); }
-			if(options.pinterest.url){ getFeedEntries(options.pinterest.url, options.pinterest.entryCount); }
-			if(options.tumblr.url){ getFeedEntries(options.tumblr.url, options.tumblr.entryCount); }
-			if(options.twitter.screenName){ getTwitterEntries(options.twitter.screenName, options.twitter.entryCount, options.twitter.env); }
-			
-			renderSocialCards(options.targetID, mySocialCards);
-			
-			/*var myTwitterURL = 'https://twitrss.me/twitter_user_to_rss/?user=brianwhaley';
-			var myTwitterId = '#twitter';
-			var myTwitterData = getFeedEntries(myTwitterURL, myTwitterId, 8, renderFeedEntries); */	
-			
-			return this;
+			if(options.goodreads.url){ getGoodreadsEntries(options.goodreads.url, options.goodreads.entryCount); }
+			if(options.instagram.userID){ getInstagramEntries(options.instagram.userID, options.instagram.entryCount); }
 		};
+		  
 		
+		
+		/* ========== ========== ========== */
+		this.init = function(){
+			gatherData();
+			renderSocialCards(options.targetID, mySocialCards);
+			return this;
+		}
 
+        return this.init();
  
-        return this;
- 
-    };
+	};
  
 }( jQuery ));
