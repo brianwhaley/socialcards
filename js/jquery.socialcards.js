@@ -36,7 +36,6 @@ function socialCards() {
 
 
 (function($) {
-
     /* $.fn.socialCards = function(options) { */
     $.socialCards = function(options) {
 
